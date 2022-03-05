@@ -80,15 +80,15 @@ const cats = [
         "description": "Немного боязливый, но очень добрый и нежный кот Светлячок. Приучен к лотку и когтеточке, ладит с детьми, привит. Станет вам хорошим другом",
         "id": 9
     }
-]
+];
 
 function createRate (rate, card) {
-    for (i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
         const img = document.createElement ("img");
         if (rate > i) {
             img.setAttribute("src", "/img/cat-fill.svg");
             img.setAttribute("id", "true");
-        }else {
+        } else {
             img.setAttribute("src", "/img/cat-stroke.svg");
             img.setAttribute("id", "false");
         }
@@ -100,7 +100,7 @@ function createRate (rate, card) {
 function createCard (cat) {
     const card = document.createElement ("div");
     card.classList.add ("card");
-    card.setAttribute("id", "cat.id");
+    card.setAttribute("id", cat.id);
 
     const name = document.createElement ("div");
     name.classList.add ("card_name");
@@ -125,7 +125,7 @@ function createCard (cat) {
 
     card.appendChild(name);
     card.appendChild(age);
-    card.appendChild(rate);
+    card.appendChild(img);
     card.appendChild(favourite);
     card.appendChild(description);
 
