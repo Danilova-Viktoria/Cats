@@ -1,10 +1,10 @@
 header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
-header .logo-img {
+header img.logo-img {
   height: 50px;
   width: 50px;
   margin-right: 30px;
