@@ -1,152 +1,193 @@
-const table = document.querySelector(".table");
+const cardContainer = document.querySelector(".grid");
 
+// show all cats
 const buttonShowAll = document.querySelector("#buttonShowAll");
-buttonShowAll.onclick = () => api.getAllCats().then(dataFromBack => createTable(dataFromBack.data));
+buttonShowAll.onclick = () =>
+  api.getAllCats().then((dataFromBack) => createGrid(dataFromBack.data));
 
+// show cats by id
 const buttonShowById = document.querySelector("#buttonShowById");
 const inputShowById = document.querySelector("#inputShowById");
 
 buttonShowById.onclick = () => {
-    api.getCatById(inputShowById.value).then((dataFromBack) => createTable(dataFromBack.data)) //[{} {}] ==> {}
+  api
+    .getCatById(inputShowById.value)
+    .then((dataFromBack) => createGrid(dataFromBack.data)); // [{}, {}] ==> {}
+};
+
+function createCard(cat) {
+  const card = document.createElement("div");
+  card.setAttribute("id", cat["id"]);
+  card.classList.add(["card"]);
+
+  createImage(card, cat);
+  createTitle(card, cat);
+  createRating(card, cat);
+
+  createActions(card, cat);
+
+  cardContainer.appendChild(card);
 }
 
-const raws = ["id", "name", "age", "description", "img_link", "rate", "favourite", "actions"];
+function createImage(container, cat) {
+  const img = document.createElement("img");
+  img.setAttribute("src", cat["img_link"]);
+  img.classList.add(["card__image"]);
 
-function createTableHeader(raws) {
-    const header = document.createElement("tr");
-    
-    raws.forEach(raw => {
-        const ceil = document.createElement("th");
-        ceil.innerText = raw;
-        header.appendChild(ceil);
+  container.appendChild(img);
+}
+
+function createTitle(container, cat) {
+  const title = document.createElement("h3");
+  title.innerText = cat["name"];
+  title.classList.add(["card__title"]);
+
+  container.appendChild(title);
+}
+
+function createRating(container, cat) {
+  const rating = document.createElement("div");
+  rating.classList.add(["card__rating"]);
+
+  const ratingValue = Number(cat["rate"]);
+
+  for (let i = 0; i < 10; i++) {
+    createRatingImage(rating, i < ratingValue);
+  }
+
+  container.appendChild(rating);
+}
+
+function createRatingImage(container, filled = true) {
+  const src = filled ? "img/cat-fill.svg" : "img/cat-stroke.svg";
+  const img = document.createElement("img");
+  img.setAttribute("src", src);
+  img.classList.add(["rating__image"]);
+
+  container.appendChild(img);
+}
+
+function createActions(container, cat) {
+  const deleteBtn = document.createElement("button");
+  deleteBtn.innerText = "Delete";
+
+  deleteBtn.addEventListener("click", () => {
+    api
+      .deleteCat(cat["id"])
+      .then(() =>
+        api.getAllCats().then((dataFromBack) => createGrid(dataFromBack.data))
+      );
+  });
+
+  container.addEventListener("click", () => {
+    info.show(cat);
+  });
+
+  container.appendChild(deleteBtn);
+}
+
+function createGrid(cats) {
+  cardContainer.innerHTML = "";
+  if (Array.isArray(cats)) {
+    cats
+      .sort((a, b) => a.id - b.id)
+      .forEach((cat) => {
+        createCard(cat);
+      });
+  }
+}
+
+function createInfoBlock() {
+  const container = document.createElement("div");
+  container.classList.add("info");
+  container.classList.add("wrapper");
+  container.classList.add("hidden");
+
+  const body = document.createElement("div");
+  body.classList.add("info");
+  body.classList.add("body");
+
+  const image = document.createElement("img");
+  image.classList.add("info");
+  image.classList.add("body__image");
+
+  const info = document.createElement("div");
+  info.classList.add("info");
+  info.classList.add("body__info");
+
+  const title = document.createElement("h2");
+  title.classList.add("info");
+  title.classList.add("info__title");
+
+  const age = document.createElement("h3");
+  age.classList.add("info");
+  age.classList.add("info__age");
+
+  const description = document.createElement("p");
+  description.classList.add("info__description");
+
+  const exitButton = document.createElement("button");
+  exitButton.innerText = "Закрыть";
+  exitButton.addEventListener("click", hide);
+
+
+
+  info.appendChild(title);
+  info.appendChild(age);
+  info.appendChild(description);
+  info.appendChild(exitButton);
+
+  body.appendChild(image);
+  body.appendChild(info);
+
+  container.appendChild(body);
+
+  document.body.appendChild(container);
+
+  function show(cat) {
+    image.setAttribute("src", cat["img_link"]);
+    title.innerText = cat["name"];
+    age.innerText = `Возраст: ${cat["age"]}`;
+    description.innerText = cat["description"];
+    container.classList.remove("hidden");
+  }
+
+  function hide() {
+    container.classList.add("hidden");
+  }
+
+  return {
+    show,
+    hide,
+  };
+}
+
+function attachCreateCatListener() {
+  const addCat = document.querySelector("#addCat");
+  const inputs = addCat.querySelectorAll("input");
+
+  addCat.addEventListener("click", (e) => {
+    e.preventDefault();
+    const bodyJSON = {};
+    inputs.forEach((input) => {
+      if (input.name === "favourite") {
+        bodyJSON[input.name] = input.checked;
+      } else {
+        bodyJSON[input.name] = input.value;
+      }
     });
-    table.appendChild(header);
+
+    api
+      .addCat(bodyJSON)
+      .then(() =>
+        api.getAllCats().then((dataFromBack) => createGrid(dataFromBack.data))
+      );
+  });
 }
 
-function createTableRaw(cat) {
-    const tableRaw = document.createElement("tr");
-    tableRaw.setAttribute("id", cat["id"])
+attachCreateCatListener();
+const info = createInfoBlock();
 
-    raws.forEach(raw => {
-        const ceil = document.createElement("td");
-        ceil.setAttribute("name", raw);
-
-        if (raw === "img_link") {
-            const img = document.createElement("img");
-            img.setAttribute("src", cat[raw])
-            ceil.appendChild(img);
-        } else if (raw === "actions") {
-            const button = document.createElement("button");
-            button.innerText = "Delete";
-            ceil.appendChild(button)
-
-            button.onclick = () => {
-                api.deleteCat(cat["id"]).then(() => api.getAllCats().then(dataFromBack => createTable(dataFromBack.data)))
-            }
-
-            // update cats
-            const button2 = document.createElement("button");
-            button2.innerText = "Update";
-            ceil.appendChild(button2);
-
-            button2.addEventListener("click", () => {
-                const tr = document.getElementById(cat["id"])
-
-                const td = tr.querySelectorAll("td")
-                for (let i = 0; i < td.length - 1; i++) {
-                    const new_ceil = td[i];
-                    new_ceil.innerHTML = "";
-
-                    console.log(new_ceil)
-                    const name = new_ceil.getAttribute("name")
-                    if (name === "favourite") {
-                        const input = document.createElement("input")
-                        input.setAttribute("type", "checkbox");
-                        input.setAttribute("name", new_ceil.getAttribute("name"));
-                        input.value = cat[name]
-                        input.className = "input"
-                        new_ceil.appendChild(input)
-                    } else if (name === "id" || name === "rate" || name === "age") {
-                        const input = document.createElement("input")
-                        input.setAttribute("name", new_ceil.getAttribute("name"));
-                        input.setAttribute("type", "number");
-                        input.value = cat[name]
-                        input.className = "input"
-                        new_ceil.appendChild(input)
-                    } else {
-                        const input = document.createElement("input")
-                        input.setAttribute("name", new_ceil.getAttribute("name"));
-                        input.setAttribute("type", "text");
-                        input.value = cat[name]
-                        input.className = "input"
-                        new_ceil.appendChild(input)
-                    }
-                }
-
-                const actions = td[td.length - 1];
-                actions.innerHTML = "";
-                const buttonUpdate = document.createElement("button");
-                buttonUpdate.innerText = "OK";
-                actions.appendChild(buttonUpdate)
-
-                // update cat
-                buttonUpdate.onclick = () => {
-                    const inputs = document.querySelectorAll(".input")
-
-                    const bodyJSON = {};
-                    inputs.forEach((input)=> {
-                        if(input.name === 'favourite') {
-                            bodyJSON[input.name] = input.checked;
-                        } else {
-                            bodyJSON[input.name] = input.value;
-                        }
-                    })
-
-                    console.log(cat["id"], bodyJSON)
-                    api.updateCat(cat["id"], bodyJSON).then(() => api.getAllCats().then(dataFromBack => createTable(dataFromBack.data)))
-                }
-
-            })
-        }
-         else {
-            ceil.innerText = cat[raw] ? cat[raw] : "";
-        }
-
-        tableRaw.appendChild(ceil);
-    })
-    table.appendChild(tableRaw);
-}
-
-function createTable(cats) {
-    table.innerHTML = "";
-    createTableHeader(raws);
-    if (Array.isArray(cats)) {
-        cats.sort((a, b) => a.id - b.id).forEach(cat => {
-            createTableRaw(cat);
-        })
-    } else {
-        createTableRaw(cats);
-    }
-}
-
-function createCat() {
-    const addCat = document.querySelector("#addCat");
-    const inputs = addCat.querySelectorAll("input"); 
-
-    // addCat.addEventListener("submit", )
-    addCat.onsubmit = (e) => {
-        e.preventDefault();
-        const bodyJSON = {};
-        inputs.forEach((input)=> {
-            if(input.name === 'favourite') {
-                bodyJSON[input.name] = input.checked;
-            } else {
-                bodyJSON[input.name] = input.value;
-            }
-        })
-
-        api.addCat(bodyJSON).then(() => api.getAllCats().then(dataFromBack => createTable(dataFromBack.data)))
-    }
-}
-
-const cats = api.getAllCats().then(dataFromBack => createTable(dataFromBack.data));
+const cats = api
+  .getAllCats()
+  .then((dataFromBack) => createGrid(dataFromBack.data));

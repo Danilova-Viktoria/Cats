@@ -1,0 +1,132 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+header .logo-img {
+  height: 50px;
+  width: 50px;
+  margin-right: 30px;
+}
+
+button {
+  transition-duration: 0.4s;
+  background-color: white;
+  color: black;
+  border: 2px solid #6cf;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 8px;
+}
+
+button:hover {
+  background-color: #6cf;
+  color: white;
+}
+
+input {
+  padding: 10px;
+  border-radius: 8px;
+  margin: 5px;
+}
+
+form,
+.action_show {
+  display: flex;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+}
+
+.grid {
+  max-width: 1200px;
+  margin: 50px auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.grid .card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  width: 300px;
+  height: 300px;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgb(105, 105, 105);
+}
+
+.grid .card:hover {
+  transform: scale(1.1);
+}
+
+.grid .card .card__image {
+  width: 300px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.grid .card .card__rating {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.grid .card .rating__image {
+  height: 10px;
+}
+
+.info.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1;
+  position: fixed;
+  top: 0;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.info.wrapper.hidden {
+  display: none;
+}
+
+.info .body {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+
+  width: 600px;
+  padding: 30px;
+  background: white;
+  border-radius: 8px;
+}
+
+.info .body__image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+}
+
+.info .body__info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1 1;
+}
